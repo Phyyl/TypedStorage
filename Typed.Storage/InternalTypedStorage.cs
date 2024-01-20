@@ -1,4 +1,4 @@
-﻿namespace TypedStorage;
+﻿namespace Typed.Storage;
 
 internal static class InternalTypedStorage
 {

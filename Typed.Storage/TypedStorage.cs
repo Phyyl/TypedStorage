@@ -1,4 +1,4 @@
-﻿namespace TypedStorage;
+﻿namespace Typed.Storage;
 
 public class TypedStorage : IDisposable
 {
