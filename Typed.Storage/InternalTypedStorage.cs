@@ -19,8 +19,13 @@ internal static class InternalTypedStorage
 
     internal static void Release(int id)
     {
-        OnClear?.Invoke(id);
+        Clear(id);
         freedSlots.Enqueue(id);
+    }
+
+    internal static void Clear(int id)
+    {
+        OnClear?.Invoke(id);
     }
 }
 

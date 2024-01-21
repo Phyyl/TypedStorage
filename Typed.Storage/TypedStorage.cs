@@ -14,6 +14,11 @@ public class TypedStorage : IDisposable
         InternalTypedStorage.Release(id);
     }
 
+    public void Clear()
+    {
+        InternalTypedStorage.Clear(id);
+    }
+
     public T? Get<T>()
     {
         return InternalTypedStorage<T>.Get(id);
