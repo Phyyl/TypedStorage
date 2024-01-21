@@ -45,9 +45,14 @@ internal static class InternalTypedStorage<T>
     {
         if (values.Length <= id)
         {
-            //TODO: Improve this by resizing by n*2 is non-empty, 1 otherwise (like Array.Add->AddWithResize->...)
-            Array.Resize(ref values, id + 1);
+            Grow();
         }
+    }
+
+    private static void Grow()
+    {
+        int newLength = values.Length == 0 ? 1 : values.Length * 2;
+        Array.Resize(ref values, newLength);
     }
 
     private static void Release(int id)
