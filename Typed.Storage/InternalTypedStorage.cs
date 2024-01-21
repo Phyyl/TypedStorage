@@ -6,7 +6,7 @@ internal static class InternalTypedStorage
 
     internal static int Size => size;
 
-    internal static event Action<int>? OnRelease;
+    internal static event Action<int>? OnClear;
 
     internal static int Reserve()
     {
@@ -16,16 +16,15 @@ internal static class InternalTypedStorage
     internal static void Release(int id)
     {
         //TODO: Add generations to reuse storage instead of infinitely resizing
-        OnRelease?.Invoke(id);
+        OnClear?.Invoke(id);
     }
 }
 
 internal static class InternalTypedStorage<T>
-    where T : class
 {
     static InternalTypedStorage()
     {
-        InternalTypedStorage.OnRelease += Release;
+        InternalTypedStorage.OnClear += Clear;
     }
 
     private static T?[] values = [];
@@ -55,11 +54,11 @@ internal static class InternalTypedStorage<T>
         Array.Resize(ref values, newLength);
     }
 
-    private static void Release(int id)
+    private static void Clear(int id)
     {
         if (values.Length > id)
         {
-            values[id] = null;
+            values[id] = default;
         }
     }
 }
