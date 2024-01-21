@@ -16,7 +16,7 @@ public class TypedStorage
         }
         else
         {
-            this.id = Interlocked.Increment(ref nextID);
+            this.id = Interlocked.Increment(ref nextID) - 1;
         }
     }
 
