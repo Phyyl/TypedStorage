@@ -2,21 +2,25 @@
 
 internal static class InternalTypedStorage
 {
-    private static int size = 0;
-
-    internal static int Size => size;
+    private static int nextID = 0;
+    private static readonly Queue<int> freedSlots = new();
 
     internal static event Action<int>? OnClear;
 
     internal static int Reserve()
     {
-        return Interlocked.Increment(ref size);
+        if (freedSlots.TryDequeue(out int slot))
+        {
+            return slot;
+        }
+
+        return Interlocked.Increment(ref nextID);
     }
 
     internal static void Release(int id)
     {
-        //TODO: Add generations to reuse storage instead of infinitely resizing
         OnClear?.Invoke(id);
+        freedSlots.Enqueue(id);
     }
 }
 
@@ -24,7 +28,13 @@ internal static class InternalTypedStorage<T>
 {
     static InternalTypedStorage()
     {
-        InternalTypedStorage.OnClear += Clear;
+        InternalTypedStorage.OnClear += static id =>
+        {
+            if (values.Length > id)
+            {
+                values[id] = default;
+            }
+        };
     }
 
     private static T?[] values = [];
@@ -52,13 +62,5 @@ internal static class InternalTypedStorage<T>
     {
         int newLength = values.Length == 0 ? 1 : values.Length * 2;
         Array.Resize(ref values, newLength);
-    }
-
-    private static void Clear(int id)
-    {
-        if (values.Length > id)
-        {
-            values[id] = default;
-        }
     }
 }
