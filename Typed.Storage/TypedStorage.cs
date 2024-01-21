@@ -1,22 +1,34 @@
 ﻿namespace Typed.Storage;
 
-public class TypedStorage : IDisposable
+public class TypedStorage
 {
+    private static int nextID = 0;
+    private static readonly Queue<int> freedIDs = new();
+    internal static event Action<int>? OnClear;
+
     private readonly int id;
 
     public TypedStorage()
     {
-        id = InternalTypedStorage.Reserve();
+        if (freedIDs.TryDequeue(out int id))
+        {
+            this.id = id;
+        }
+        else
+        {
+            this.id = Interlocked.Increment(ref nextID);
+        }
     }
 
-    public void Dispose()
+    ~TypedStorage()
     {
-        InternalTypedStorage.Release(id);
+        Clear(id);
+        freedIDs.Enqueue(id);
     }
 
     public void Clear()
     {
-        InternalTypedStorage.Clear(id);
+        Clear(id);
     }
 
     public T? Get<T>()
@@ -27,5 +39,10 @@ public class TypedStorage : IDisposable
     public void Set<T>(T value)
     {
         InternalTypedStorage<T>.Set(id, value);
+    }
+
+    internal static void Clear(int id)
+    {
+        OnClear?.Invoke(id);
     }
 }

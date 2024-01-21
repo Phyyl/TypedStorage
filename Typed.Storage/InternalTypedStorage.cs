@@ -1,39 +1,10 @@
 ﻿namespace Typed.Storage;
 
-internal static class InternalTypedStorage
-{
-    private static int nextID = 0;
-    private static readonly Queue<int> freedSlots = new();
-
-    internal static event Action<int>? OnClear;
-
-    internal static int Reserve()
-    {
-        if (freedSlots.TryDequeue(out int slot))
-        {
-            return slot;
-        }
-
-        return Interlocked.Increment(ref nextID);
-    }
-
-    internal static void Release(int id)
-    {
-        Clear(id);
-        freedSlots.Enqueue(id);
-    }
-
-    internal static void Clear(int id)
-    {
-        OnClear?.Invoke(id);
-    }
-}
-
 internal static class InternalTypedStorage<T>
 {
     static InternalTypedStorage()
     {
-        InternalTypedStorage.OnClear += static id =>
+        TypedStorage.OnClear += static id =>
         {
             if (values.Length > id)
             {
