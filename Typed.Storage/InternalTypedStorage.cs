@@ -1,6 +1,7 @@
 ﻿namespace Typed.Storage;
 
 internal static class InternalTypedStorage<T>
+    where T : notnull
 {
     static InternalTypedStorage()
     {
@@ -9,6 +10,14 @@ internal static class InternalTypedStorage<T>
             if (values.Length > id)
             {
                 values[id] = default;
+            }
+        };
+
+        TypedStorage.OnQuery += static (id, visitor) =>
+        {
+            if (values.Length > id && values[id] is T t)
+            {
+                visitor.Visit(t);
             }
         };
     }
