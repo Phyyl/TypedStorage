@@ -11,6 +11,14 @@ internal static class InternalTypedStorage<T>
                 values[id] = default;
             }
         };
+
+        TypedStorage.OnQuery += static (id, visitor) =>
+        {
+            if (values.Length > id && values[id] is T t)
+            {
+                visitor.Visit(t);
+            }
+        };
     }
 
     private static T?[] values = [];
